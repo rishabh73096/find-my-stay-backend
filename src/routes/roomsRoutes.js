@@ -13,7 +13,7 @@ router.delete('/room/:roomId', authenticate, RoomCtrl.DeleteRoom);
 
 router.patch(
   '/room/:roomId/update-beds',
-  auth,
+  authenticate,
   RoomCtrl.UpdateBedsAfterBooking,
 );
 

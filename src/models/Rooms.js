@@ -5,7 +5,7 @@ const roomSchema = new mongoose.Schema(
   {
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Admin/PG-Owner/User who posted the room
+      ref: 'User',
       required: true
     },
 
@@ -23,8 +23,10 @@ const roomSchema = new mongoose.Schema(
       min: 0
     },
 
-    totalBeds: { type: Number, required: true },
-    availableBeds: { type: Number, required: true },
+    beds: {
+      total: { type: Number, required: true },
+      available: { type: Number, required: true }
+    },
 
     genderAllowed: {
       type: String,
@@ -32,44 +34,17 @@ const roomSchema = new mongoose.Schema(
       default: 'Any'
     },
 
-    amenities: {
-      wifi: { type: Boolean, default: false },
-      ac: { type: Boolean, default: false },
-      mealIncluded: { type: Boolean, default: false },
-      powerBackup: { type: Boolean, default: false },
-      laundry: { type: Boolean, default: false },
-      parking: { type: Boolean, default: false }
-    },
-
     address: {
-      street: { type: String },
       city: { type: String, required: true },
       state: { type: String, required: true },
-      pincode: { type: String, required: true },
-      latitude: { type: Number },
-      longitude: { type: Number }
+      pincode: { type: String, required: true }
     },
 
-    images: [{ type: String }], // Cloudinary/Local image URLs
+    images: [{ type: String }], // Optional but recommended
 
     description: { type: String },
-    
-    isAvailable: {
-      type: Boolean,
-      default: true
-    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
-
-roomSchema.set('toJSON', {
-  virtuals: true,
-  transform: (_, ret) => {
-    delete ret.__v;
-    return ret;
-  }
-});
 
 module.exports = mongoose.model('Rooms', roomSchema);

@@ -8,47 +8,17 @@ const bookingSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: [
-        "requested",
-        "approved",
-        "visited",
-        "pending_payment",
-        "paid",
-        "cancelled"
-      ],
+      enum: ["requested", "approved", "visited", "pending_payment", "paid", "cancelled"],
       default: "requested",
     },
 
     bookingCode: { type: String, unique: true },
-
-    // Pricing System
-    roomPriceAtBooking: { type: Number, required: true },
-    discount: { type: Number, default: 0 },
-    securityDeposit: { type: Number, default: 0 },
     totalAmount: { type: Number, required: true },
-
-    // Payment Tracking
     paymentMethod: { type: String, enum: ["online", "cash", "upi"] },
-    paymentId: { type: String },
-    refundAmount: { type: Number, default: 0 },
-    isRefundable: { type: Boolean, default: true },
 
-    // Visit / Stay
-    visitDate: { type: Date },
-    stayStartDate: { type: Date },
-    stayEndDate: { type: Date },
-    durationMonths: { type: Number },
-
-    // Tracking
+    visitDate: { type: Date, required: true },
     bedCountBooked: { type: Number, default: 1 },
-    autoCancelAt: { type: Date },
-    cancellationReason: { type: String },
 
-    // Feedback
-    rating: { type: Number, min: 1, max: 5 },
-    review: { type: String },
-
-    // Customer Docs
     documents: [
       {
         type: { type: String, enum: ["Aadhar", "College-ID", "Other"] },
