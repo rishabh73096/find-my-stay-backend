@@ -1,11 +1,10 @@
-'use strict';
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const roomSchema = new mongoose.Schema(
   {
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true
     },
 
@@ -13,7 +12,7 @@ const roomSchema = new mongoose.Schema(
 
     roomType: {
       type: String,
-      enum: ['Single', 'Double', 'Triple', 'Dormitory'],
+      enum: ["Single", "Double", "Triple", "Dormitory"],
       required: true
     },
 
@@ -23,28 +22,38 @@ const roomSchema = new mongoose.Schema(
       min: 0
     },
 
-    beds: {
-      total: { type: Number, required: true },
-      available: { type: Number, required: true }
+    // ✔ Matching your payload: availableBeds + totalBeds
+    totalBeds: {
+      type: Number,
+      required: true
+    },
+
+    availableBeds: {
+      type: Number,
+      required: true
     },
 
     genderAllowed: {
       type: String,
-      enum: ['Boys', 'Girls', 'Any'],
-      default: 'Any'
+      enum: ["Boys", "Girls", "Any"],
+      default: "Any"
     },
 
+    // ✔ Payload has city, state, pincode, + address (street/area)
     address: {
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      pincode: { type: String, required: true }
+      type: String, // e.g., "vijaynagar"
+      required: true
     },
 
-    images: [{ type: String }], // Optional but recommended
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    pincode: { type: String, required: true },
 
-    description: { type: String },
+    images: [{ type: String }],
+
+    description: { type: String }
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Rooms', roomSchema);
+module.exports = mongoose.model("Rooms", roomSchema);

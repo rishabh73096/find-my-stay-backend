@@ -7,13 +7,16 @@ module.exports = {
   // ➕ Add New Room
   AddRooms: async (req, res) => {
     try {
-      const ownerId = req.user?._id; // JWT me user ka id hona chahiye
+      const ownerId = req.user?.id;
       const payload = req.body;
+      console.log('room', payload);
 
       payload.owner = ownerId;
 
       const room = await Rooms.create(payload);
-      return response.success(res, 'Room Added Successfully', room);
+      console.log('room', room);
+
+      return response.ok(res, 'Room Added Successfully', room);
     } catch (err) {
       return response.error(res, err.message);
     }
@@ -22,11 +25,28 @@ module.exports = {
   // 📌 Get All Rooms (List)
   GetAllRooms: async (req, res) => {
     try {
-      const rooms = await Rooms.find({ isAvailable: true }).populate(
-        'owner',
-        'name email',
-      );
-      return response.success(res, 'Room list fetched', rooms);
+      let { page = 1, limit = 10 } = req.query;
+
+      page = parseInt(page);
+      limit = parseInt(limit);
+
+      const skip = (page - 1) * limit;
+
+      const totalRooms = await Rooms.countDocuments();
+
+      const rooms = await Rooms.find()
+        .populate('owner', 'name email')
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 });
+
+      return response.ok(res, {
+        totalPages: Math.ceil(totalRooms / limit),
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems: totalRooms, // optional but useful
+        data: rooms,
+      });
     } catch (err) {
       return response.error(res, err.message);
     }
@@ -36,11 +56,11 @@ module.exports = {
   GetRoomById: async (req, res) => {
     try {
       const { roomId } = req.params;
-      const room = await Rooms.findById(roomId).populate('owner', 'name email');
+      const room = await Rooms.findById(roomId).populate('owner',);
 
       if (!room) return response.notFound(res, 'Room not found');
 
-      return response.success(res, 'Room details fetched', room);
+      return response.ok(res, room);
     } catch (err) {
       return response.error(res, err.message);
     }
@@ -56,24 +76,26 @@ module.exports = {
       if (genderAllowed) filter.genderAllowed = genderAllowed;
 
       const rooms = await Rooms.find(filter);
-      return response.success(res, 'Filtered rooms fetched', rooms);
+      return response.ok(res, 'Filtered rooms fetched', rooms);
     } catch (err) {
       return response.error(res, err.message);
     }
   },
 
-  // ✏ Update Room
   UpdateRoom: async (req, res) => {
     try {
-      const { roomId } = req.params;
+      const { editId } = req.params;
       const payload = req.body;
+      console.log('payload', payload);
 
-      const room = await Rooms.findByIdAndUpdate(roomId, payload, {
+      const room = await Rooms.findByIdAndUpdate(editId, payload, {
         new: true,
       });
+      console.log('room', room);
+
       if (!room) return response.notFound(res, 'Room not found');
 
-      return response.success(res, 'Room updated', room);
+      return response.ok(res, 'update sucessfully', room);
     } catch (err) {
       return response.error(res, err.message);
     }
@@ -87,7 +109,7 @@ module.exports = {
       const room = await Rooms.findByIdAndDelete(roomId);
       if (!room) return response.notFound(res, 'Room not found');
 
-      return response.success(res, 'Room deleted successfully', room);
+      return response.ok(res, 'Room deleted successfully', room);
     } catch (err) {
       return response.error(res, err.message);
     }

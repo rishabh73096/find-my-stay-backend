@@ -7,23 +7,23 @@ const response = require('../../responses');
 module.exports = {
   CreateBooking: async (req, res) => {
     try {
-      const userId = req.user._id;
+      const userId = req.user.id;
       const {
-        room,
+        roomId,
         bedCountBooked,
         totalAmount,
         roomPriceAtBooking,
         visitDate,
       } = req.body;
 
-      const roomData = await Rooms.findById(room);
+      const roomData = await Rooms.findById(roomId);
       if (!roomData) return response.notFound(res, 'Room not found');
 
       if (roomData.availableBeds < bedCountBooked)
         return response.error(res, 'Not enough beds available');
 
       const booking = await Booking.create({
-        room,
+        roomId,
         user: userId,
         owner: roomData.owner,
         bedCountBooked,

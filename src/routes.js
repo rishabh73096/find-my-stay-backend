@@ -6,6 +6,7 @@ const bookingRoutes = require("../src/routes/bookingroutes");
 module.exports = (app) => {
   app.use('/auth', authRoutes);
   app.use("/contact", contact)
-  app.use('/auth', roomsRoutes);
+  app.use('/rooms', roomsRoutes);
   app.use("/booking", bookingRoutes)
+  
 };
