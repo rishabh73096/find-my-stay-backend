@@ -3,7 +3,7 @@ const BookingCtrl = require('@controllers/bookingsControler');
 const { authenticate } = require('@middlewares/authMiddleware');
 
 
-router.post("/booking", authenticate, BookingCtrl.CreateBooking);
+router.post("/Create", authenticate, BookingCtrl.CreateBooking);
 router.get("/customer/bookings", authenticate, BookingCtrl.GetCustomerBookings);
 router.patch("/booking/:bookingId/payment-ready", authenticate, BookingCtrl.ReadyForPayment);
 router.patch("/booking/:bookingId/payment-success", authenticate, BookingCtrl.PaymentDone);

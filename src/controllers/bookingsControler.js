@@ -8,7 +8,7 @@ module.exports = {
   CreateBooking: async (req, res) => {
     try {
       const userId = req.user.id;
-      const {
+      let {
         roomId,
         bedCountBooked,
         totalAmount,
@@ -16,12 +16,30 @@ module.exports = {
         visitDate,
       } = req.body;
 
-      const roomData = await Rooms.findById(roomId);
-      if (!roomData) return response.notFound(res, 'Room not found');
+      // ✅ Ensure number
+      bedCountBooked = Number(bedCountBooked);
 
-      if (roomData.availableBeds < bedCountBooked)
+      if (!bedCountBooked || bedCountBooked <= 0) {
+        return response.error(res, 'Invalid bed count');
+      }
+
+      // ✅ ATOMIC: check + deduct beds
+      const roomData = await Rooms.findOneAndUpdate(
+        {
+          _id: roomId,
+          availableBeds: { $gte: bedCountBooked },
+        },
+        {
+          $inc: { availableBeds: -bedCountBooked },
+        },
+        { new: true },
+      );
+
+      if (!roomData) {
         return response.error(res, 'Not enough beds available');
+      }
 
+      // ✅ Create booking AFTER bed lock
       const booking = await Booking.create({
         roomId,
         user: userId,
@@ -33,13 +51,14 @@ module.exports = {
         status: 'requested',
       });
 
-      return response.success(res, 'Booking request created', booking);
+      return response.ok(res, 'Booking request created', booking);
     } catch (err) {
+      console.error('CreateBooking Error:', err);
       return response.error(res, err.message);
     }
   },
 
-  // 2️⃣ Owner/Admin → Get All Bookings (Global)
+  
   AdminGetAllBookings: async (req, res) => {
     try {
       const bookings = await Booking.find()
@@ -51,7 +70,7 @@ module.exports = {
     }
   },
 
-  // 3️⃣ Owner/Admin → Booking Details by ID
+ 
   AdminGetBookingDetails: async (req, res) => {
     try {
       const { bookingId } = req.params;
