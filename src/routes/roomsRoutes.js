@@ -8,7 +8,7 @@ router.post('/add', authenticate, RoomCtrl.AddRooms);
 router.get('/getAll', RoomCtrl.GetAllRooms);
 router.get('/getRoom/:roomId', RoomCtrl.GetRoomById);
 router.get('/filter/rooms', RoomCtrl.GetRoomsByFilter);
-router.put('/update/:editId', authenticate, RoomCtrl.UpdateRoom);
+router.post('/update/:editId', authenticate, RoomCtrl.UpdateRoom);
 router.delete('/delete/:roomId', authenticate, RoomCtrl.DeleteRoom);
 
 router.patch(

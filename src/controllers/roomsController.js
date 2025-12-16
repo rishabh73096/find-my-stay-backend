@@ -84,6 +84,7 @@ module.exports = {
 
   UpdateRoom: async (req, res) => {
     try {
+      console.log('req.params', req.params);
       const { editId } = req.params;
       const payload = req.body;
       console.log('payload', payload);
