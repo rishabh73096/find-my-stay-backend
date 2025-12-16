@@ -82,7 +82,7 @@ module.exports = {
 
   getUser: async (req, res) => {
     try {
-      const { userId } = req.body;
+      const userId  = req.user.id;
 
       if (!userId) {
         return res

@@ -58,47 +58,43 @@ module.exports = {
     }
   },
 
-  
   AdminGetAllBookings: async (req, res) => {
     try {
-      const bookings = await Booking.find()
-        .populate('user', 'name email')
-        .populate('room', 'propertyName pricePerMonth');
-      return response.success(res, 'All bookings fetched', bookings);
+      const bookings = await Booking.find().populate('user').populate('roomId');
+      console.log(bookings);
+
+      return response.ok(res, bookings);
     } catch (err) {
       return response.error(res, err.message);
     }
   },
 
- 
   AdminGetBookingDetails: async (req, res) => {
     try {
       const { bookingId } = req.params;
 
       const booking = await Booking.findById(bookingId)
-        .populate('user', 'name email')
-        .populate('owner', 'name email')
-        .populate('room');
+        .populate('user', 'username lastname number email')
+        .populate('owner', 'username number')
+        .populate('roomId'); // 👈 FIX
 
-      if (!booking) return response.notFound(res, 'Booking not found');
+      if (!booking) {
+        return response.notFound(res, 'Booking not found');
+      }
 
-      return response.success(res, 'Booking details fetched', booking);
+      return response.ok(res, 'Booking details fetched', booking);
     } catch (err) {
       return response.error(res, err.message);
     }
   },
 
-  // 4️⃣ Customer → Get My Bookings
   GetCustomerBookings: async (req, res) => {
     try {
-      const userId = req.user._id;
-
-      const bookings = await Booking.find({ user: userId }).populate(
-        'room',
-        'propertyName pricePerMonth images',
-      );
-
-      return response.success(res, 'Customer bookings fetched', bookings);
+      console.log(req.user.id);
+      const userId = req.user.id;
+      const bookings = await Booking.find({ user: userId }).populate('roomId');
+      console.log(bookings);
+      return response.ok(res, bookings);
     } catch (err) {
       return response.error(res, err.message);
     }
@@ -113,7 +109,7 @@ module.exports = {
         .populate('room', 'propertyName')
         .populate('user', 'name email');
 
-      return response.success(res, 'Owner bookings fetched', bookings);
+      return response.ok(res, 'Owner bookings fetched', bookings);
     } catch (err) {
       return response.error(res, err.message);
     }
@@ -130,7 +126,7 @@ module.exports = {
         { new: true },
       );
 
-      return response.success(res, 'Booking approved', booking);
+      return response.ok(res, 'Booking approved', booking);
     } catch (err) {
       return response.error(res, err.message);
     }
@@ -147,7 +143,7 @@ module.exports = {
         { new: true },
       );
 
-      return response.success(res, 'Visit marked completed', booking);
+      return response.ok(res, 'Visit marked completed', booking);
     } catch (err) {
       return response.error(res, err.message);
     }
@@ -164,13 +160,13 @@ module.exports = {
         { new: true },
       );
 
-      return response.success(res, 'Proceed to payment', booking);
+      return response.ok(res, 'Proceed to payment', booking);
     } catch (err) {
       return response.error(res, err.message);
     }
   },
 
-  // 9️⃣ After successful payment
+  // 9️⃣ After okful payment
   PaymentDone: async (req, res) => {
     try {
       const { bookingId } = req.params;
@@ -187,11 +183,7 @@ module.exports = {
         $inc: { availableBeds: -booking.bedCountBooked },
       });
 
-      return response.success(
-        res,
-        'Booking confirmed & payment successful',
-        booking,
-      );
+      return response.ok(res, 'Booking confirmed & payment okful', booking);
     } catch (err) {
       return response.error(res, err.message);
     }
@@ -209,7 +201,7 @@ module.exports = {
         { new: true },
       );
 
-      return response.success(res, 'Booking cancelled', booking);
+      return response.ok(res, 'Booking cancelled', booking);
     } catch (err) {
       return response.error(res, err.message);
     }
